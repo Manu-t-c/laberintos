@@ -1,28 +1,35 @@
 #ifndef JUEGO_H
 #define JUEGO_H
-#include "Tablero.h"
+
+#include <string>
 #include "Jugador.h"
-#include "Movimiento.h"
 #include "Puntaje.h"
-#include "PilaTesoros.h"
+
+// Declaraciones mínimas para evitar dependencias circulares
+class Tablero;
+class PilaTesoros;
+class Tesoro;
 
 class Juego {
 private:
-    Tablero tablero;
     Jugador jugador;
-    PilaTesoros tesoros;
-    Movimiento movimiento;
-    Puntaje puntaje;
+    Tablero *tablero;      // → Persona 1 lo crea y lo pasa a Juego
+    PilaTesoros *pila;     // → Persona 2 lo crea y lo pasa a Juego
+    Puntaje puntajes;      // → Tabla Hash que ya aprobamos
+
+    int tesorosRecolectados;
+
+    void loopPartida();
+    void procesarMovimiento(char tecla);
+    void usarTesoro();
 
 public:
-    Juego();
-    void iniciar();
-    void jugar();
-    void usarTesoro();
-    void finalizar();
+    // El constructor SOLO recibe punteros de afuera.
+    Juego(Tablero *t, PilaTesoros *p);
 
+    // inicia todo el juego
+    void iniciar();
 };
 
+#endif
 
-
-#endif //JUEGO_H

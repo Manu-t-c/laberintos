@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "D:/GIT/laberintos/cmake-build-debug",
-		"source" : "D:/GIT/laberintos"
+		"build" : "C:/Users/ALEJANDRO/Escritorio/laberintos/cmake-build-debug",
+		"source" : "C:/Users/ALEJANDRO/Escritorio/laberintos"
 	},
 	"version" : 
 	{
