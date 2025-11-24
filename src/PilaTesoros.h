@@ -4,12 +4,11 @@
 #include <string>
 
 class PilaTesoros {
-  struct Tesoro {
+  struct Tesoros{
     std::string type;
     Tesoro(std::string t = "") : type(t) {}
     };
 };
-
 
 
 #endif //PILATESOROS_H
