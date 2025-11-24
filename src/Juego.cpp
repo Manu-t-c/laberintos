@@ -44,6 +44,18 @@ void Juego::iniciar() {
 
     std::cout << "=== RANKING ===\n";
     puntajes.mostrarScoresOrdenados();
+
+    char opcion;
+    std::cout << "¿Desea jugar otra partida? (S/N): ";
+    std::cin >> opcion;
+
+    // se estandariza la entrada para evitar errores
+    opcion = toupper(opcion);
+    std::cin.ignore();
+
+    if (opcion == 'S') {
+        iniciar(); // volver a comenzar
+    }
 }
 
 void Juego::loopPartida() {
@@ -129,7 +141,7 @@ void Juego::procesarMovimiento(char tecla) {
         pila->push(t);
         tesorosRecolectados++;
         nuevoNodo->estaTesoro = false;
-        std::cout << "Encontraste un tesoro!\n";
+        std::cout << "Encontraste un tesoro: " << t.tipo << "!\n";
     }
 }
 
@@ -155,8 +167,8 @@ void Juego::usarTesoro() {
         // eliminar 2 muros aleatorios
         int eliminados = 0;
         while (eliminados < 2) {
-            int fila = rand() % 10; // ajustar al tamaño de tu tablero
-            int col = rand() % 10;
+            int fila = rand() % 9; // ajustar al tamaño de tu tablero
+            int col = rand() % 9;
             Nodo* n = tablero->obtenerNodo(fila, col);
             if (n && n->esMuroInterior) {
                 n->esMuroInterior = false;
@@ -179,7 +191,7 @@ void Juego::usarTesoro() {
         // teletransportar jugador a un nodo vacío aleatorio
         Nodo* nuevoNodo;
         do {
-            int fila = rand() % 10; // ajustar según tu tamaño de tablero
+            int fila = rand() % 10; // ajustar según tamaño de tablero
             int col = rand() % 10;
             nuevoNodo = tablero->obtenerNodo(fila, col);
         } while (!nuevoNodo || nuevoNodo->estaJugador || nuevoNodo->esParedExterior || nuevoNodo->esMuroInterior);
