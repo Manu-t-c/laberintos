@@ -8,8 +8,9 @@ public:
     int row, col;
     bool esParedExterior;
     bool esMuroInterior;
-    bool estaPlayer;
+    bool estaJugador;
     bool estaTesoro;
+    bool estaDescubierto;
     std::string tipoTesoro;
 
     Nodo* arriba;

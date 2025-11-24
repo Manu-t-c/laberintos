@@ -9,19 +9,24 @@ private:
     Nodo* head;
 
 public:
-    Nodo* playerNode;
+    Nodo* nodoJugador;
     int tesorosRestantes;
 
     Tablero();
+
     void generarTablero();
-    Nodo* getNodo(int row, int col);
+    Nodo* obtenerNodo(int row, int col);
+
     void lugarParedExterna();
     void lugarMuroInterno();
     void lugarTesoros();
     void lugarJugador();
 
-    void mostrar(Nodo* nodo);
+    void destaparCasilla(Nodo* nodo);
     void imprimirTablero();
+
+    bool posicionValidaJugador(Nodo* nodo);
+    bool posicionValidaTesoro(Nodo* nodo);
 };
 
 
