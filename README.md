@@ -1,1 +1,1 @@
-Realizado por Santiago Salazar, Manuela Trujillo y Jacobo Lopez
+Realizado por Santiago Salazar, Manuela Trujillo y Jacobo Zapata
