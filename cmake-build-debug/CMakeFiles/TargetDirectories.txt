@@ -1,3 +1,0 @@
-C:/Users/ellap/Downloads/proyectoE/cmake-build-debug/CMakeFiles/Laberintos.dir
-C:/Users/ellap/Downloads/proyectoE/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/ellap/Downloads/proyectoE/cmake-build-debug/CMakeFiles/rebuild_cache.dir
