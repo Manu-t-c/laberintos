@@ -1,14 +1,23 @@
 #ifndef PILATESOROS_H
 #define PILATESOROS_H
 
-#include <string>
+#include <stack>
+#include <iostream>
+#include "Tesoro.h"
 
 class PilaTesoros {
-  struct Tesoros{
-    std::string type;
-    Tesoro(std::string t = "") : type(t) {}
-    };
+private:
+    std::stack<Tesoro> pila;
+
+public:
+    void push(const Tesoro& t);
+    Tesoro pop();
+
+    bool estaVacia() const;
+    void vaciar();
+
+    void mostrar() const;
 };
 
+#endif
 
-#endif //PILATESOROS_H

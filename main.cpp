@@ -1,11 +1,11 @@
-#include "Juego.h"
-#include "Tablero.h"
-#include "PilaTesoros.h"
+#include "src/Juego.h"
+#include "src/Tablero.h"
+#include "src/PilaTesoros.h"
 
 int main() {
 
-    Tablero tablero;         // Persona 1 lo construyó
-    PilaTesoros pila;        // Persona 2 lo construyó
+    Tablero tablero;
+    PilaTesoros pila;
 
     Juego juego(&tablero, &pila);
     juego.iniciar();

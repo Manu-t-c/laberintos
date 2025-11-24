@@ -234,3 +234,16 @@ void Tablero::imprimirTablero() {
         fila = fila->abajo;
     }
 }
+
+void Tablero::resetearEspaciosInternos() {
+    Nodo* fila = head;
+    while (fila) {
+        Nodo* actual = fila;
+        while (actual) {
+            if (!actual->esMuroInterior && !actual->esParedExterior && !actual->estaJugador)
+                actual->estaDescubierto = false;
+            actual = actual->derecha;
+        }
+        fila = fila->abajo;
+    }
+}

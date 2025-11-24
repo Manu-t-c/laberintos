@@ -27,6 +27,7 @@ public:
 
     bool posicionValidaJugador(Nodo* nodo);
     bool posicionValidaTesoro(Nodo* nodo);
+    void resetearEspaciosInternos();
 };
 
 

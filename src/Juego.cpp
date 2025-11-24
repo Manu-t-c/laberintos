@@ -5,9 +5,11 @@
 
 #include <iostream>
 #include <cctype>
+#include <conio.h>
+#include <cstdlib>
 
 Juego::Juego(Tablero *t, PilaTesoros *p) {
-    tablero = t;        // Los crea Persona 1 y 2 afuera
+    tablero = t;
     pila = p;
     tesorosRecolectados = 0;
 }
@@ -22,7 +24,6 @@ void Juego::iniciar() {
     jugador.puntaje = 0;
     tesorosRecolectados = 0;
 
-    // --- Persona 1 ---
     // generar tablero completo
     tablero->generarTablero();
     tablero->lugarParedExterna();
@@ -30,7 +31,7 @@ void Juego::iniciar() {
     tablero->lugarTesoros();
     tablero->lugarJugador();
 
-    // --- Persona 2 ---
+
     // limpiar pila
     pila->vaciar();
 
@@ -49,18 +50,19 @@ void Juego::loopPartida() {
 
     while (tesorosRecolectados < 10) {
 
-        tablero->imprimirTablero();   // Persona 1
+        tablero->imprimirTablero();
 
         std::cout << "\nPuntaje: " << jugador.puntaje
                   << "\nTesoros: " << tesorosRecolectados << "/10\n";
         std::cout << "Movimiento (WASD) | T=ver tesoros | X=usar tesoro: ";
 
-        char op;
-        std::cin >> op;
-        op = std::toupper(op);
+
+        char op = _getch();
+        op = toupper(op);
+
 
         if (op == 'T') {
-            pila->mostrar();       // Persona 2
+            pila->mostrar();
         }
         else if (op == 'X') {
             usarTesoro();
@@ -71,30 +73,62 @@ void Juego::loopPartida() {
         else {
             std::cout << "Comando invalido.\n";
         }
+        std::cout << "\n";
     }
+
+    std::cout << "\nPartida terminada!\n";
+
 }
 
 void Juego::procesarMovimiento(char tecla) {
     bool encontroTesoro = false;
-    Tesoro t;
     bool chocoMuro = false;
 
-    // Persona 1 implementa moverJugador COMPLETO
-    bool seMovio = tablero->moverJugador(tecla, encontroTesoro, t, chocoMuro);
+    int fila = tablero->nodoJugador->row;
+    int col = tablero->nodoJugador->col;
 
-    if (!seMovio) {
-        if (chocoMuro)
-            std::cout << "Hay un muro!\n";
-        else
-            std::cout << "Movimiento invalido.\n";
+    int nuevaFila = fila;
+    int nuevaCol = col;
+
+    switch (tecla) {
+        case 'W': nuevaFila--; break;
+        case 'S': nuevaFila++; break;
+        case 'A': nuevaCol--; break;
+        case 'D': nuevaCol++; break;
+    }
+
+    Nodo* nuevoNodo = tablero->obtenerNodo(nuevaFila, nuevaCol);
+
+    // pared exterior
+    if (!nuevoNodo || nuevoNodo->esParedExterior) {
+        std::cout << "¡No puedes atravesar la pared exterior!\n";
         return;
     }
 
+    if (nuevoNodo->esMuroInterior) {
+        std::cout << "¡Te topaste con un muro!\n";
+        nuevoNodo->estaDescubierto = true; // mostrar muro
+        return;
+    }
+
+    // mover jugador
+    tablero->nodoJugador->estaJugador = false;
+    if (!nuevoNodo->estaTesoro) {
+        nuevoNodo->estaDescubierto = true;
+    }
+
+    nuevoNodo->estaJugador = true;
+    tablero->nodoJugador = nuevoNodo;
+
     jugador.puntaje++;
 
-    if (encontroTesoro) {
-        pila->apilar(t);                   // Persona 2
+    // recoger tesoro si hay
+    if (nuevoNodo->estaTesoro) {
+        Tesoro t;
+        t.tipo = nuevoNodo->tipoTesoro;
+        pila->push(t);
         tesorosRecolectados++;
+        nuevoNodo->estaTesoro = false;
         std::cout << "Encontraste un tesoro!\n";
     }
 }
@@ -105,35 +139,70 @@ void Juego::usarTesoro() {
         return;
     }
 
-    Tesoro t = pila->desapilar();   // Persona 2
+    Tesoro t = pila->pop(); // quita el tesoro de la pila
+    // Disminuir el contador de tesoros recolectados
+    tesorosRecolectados--;
 
-    switch (t.getTipo()) {
-        case Tesoro::RUBI:
-            jugador.puntaje /= 2;
-            std::cout << "Rubí: puntaje reducido.\n";
-            break;
+    // resetear tablero: volver a tapar espacios internos
+    tablero->resetearEspaciosInternos();
 
-        case Tesoro::DIAMANTE:
-            tablero->eliminarMurosAleatorios(2);   // Persona 1
-            std::cout << "Diamante: se eliminaron 2 muros.\n";
-            break;
-
-        case Tesoro::PERLA:
-            if (rand()%2 == 0) {
-                jugador.puntaje = 0;
-                std::cout << "Perla: puntaje a 0!\n";
-            } else {
-                jugador.puntaje *= 2;
-                std::cout << "Perla: puntaje x2!\n";
+    // tesoros efectos
+    if (t.tipo == "Rubi") {
+        jugador.puntaje /= 2;
+        std::cout << "Rubí: puntaje reducido.\n";
+    }
+    else if (t.tipo == "Diamante") {
+        // eliminar 2 muros aleatorios
+        int eliminados = 0;
+        while (eliminados < 2) {
+            int fila = rand() % 10; // ajustar al tamaño de tu tablero
+            int col = rand() % 10;
+            Nodo* n = tablero->obtenerNodo(fila, col);
+            if (n && n->esMuroInterior) {
+                n->esMuroInterior = false;
+                n->estaDescubierto = true; // opcional para mostrar el camino
+                eliminados++;
             }
-            break;
+        }
+        std::cout << "Diamante: 2 muros eliminados.\n";
+    }
+    else if (t.tipo == "Perla") {
+        if (rand() % 2 == 0) {
+            jugador.puntaje = 0;
+            std::cout << "Perla: puntaje a 0!\n";
+        } else {
+            jugador.puntaje *= 2;
+            std::cout << "Perla: puntaje x2!\n";
+        }
+    }
+    else if (t.tipo == "Ambar") {
+        // teletransportar jugador a un nodo vacío aleatorio
+        Nodo* nuevoNodo;
+        do {
+            int fila = rand() % 10; // ajustar según tu tamaño de tablero
+            int col = rand() % 10;
+            nuevoNodo = tablero->obtenerNodo(fila, col);
+        } while (!nuevoNodo || nuevoNodo->estaJugador || nuevoNodo->esParedExterior || nuevoNodo->esMuroInterior);
 
-        case Tesoro::AMBAR:
-            tablero->teletransportarJugador();     // Persona 1
-            std::cout << "Ámbar: teletransportado.\n";
-            break;
+        // mover jugador
+        tablero->nodoJugador->estaJugador = false;
+        nuevoNodo->estaJugador = true;
+        tablero->nodoJugador = nuevoNodo;
+        nuevoNodo->estaDescubierto = true;
+
+        std::cout << "Ámbar: jugador teletransportado.\n";
     }
 
-    tablero->reubicarTesoro(t);   // Persona 1
-    tablero->resetCasillas();     // Persona 1
+    // REUBICAR el tesoro usado en el tablero
+    Nodo* nodoTesoro;
+    do {
+        int fila = rand() % 10; // ajustar según tu tamaño de tablero
+        int col = rand() % 10;
+        nodoTesoro = tablero->obtenerNodo(fila, col);
+    } while (!nodoTesoro || nodoTesoro->estaJugador || nodoTesoro->esParedExterior || nodoTesoro->esMuroInterior);
+
+    nodoTesoro->estaTesoro = true;
+    nodoTesoro->tipoTesoro = t.tipo;
+    nodoTesoro->estaDescubierto = false;
 }
+

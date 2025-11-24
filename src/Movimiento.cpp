@@ -1,122 +1,53 @@
 #include "Movimiento.h"
-
-#include "Movimiento.h"
 #include <iostream>
 
-bool Movimiento::moverArriba(Tablero& tablero, Jugador& jugador, PilaTesoros& pila) {
+bool Movimiento::mover(Tablero &tablero, Jugador &jugador, Nodo* destino) {
+    if (destino == nullptr) return false;
 
-    Nodo* actual = tablero.getJugadorPos();
-    Nodo* destino = actual->arriba;
-
-    // 1. Revisar si existe casilla arriba (por seguridad)
-    if (destino == nullptr) {
-        std::cout << "No puedes salir del tablero.\n";
-        return false;
-    }
-
-    // 2. Revisar si es muro exterior
+    // Si hay pared exterior → no se mueve
     if (destino->esParedExterior) {
-        std::cout << "Hay una pared (#) arriba.\n";
-        destino->visitado = true;
+        std::cout << "No puedes pasar: hay una pared exterior.\n";
         return false;
     }
 
-    // 3. Revisar si es muro interior
+    // Si hay muro interior → tampoco se mueve
     if (destino->esMuroInterior) {
-        std::cout << "Hay un muro (|) arriba.\n";
-        destino->visitado = true;
+        std::cout << "No puedes pasar: hay un muro interior.\n";
         return false;
     }
 
-    // 4. Movimiento válido — mover jugador
-    actual->jugador = false;
-    destino->jugador = true;
-    tablero.setJugadorPos(destino);
+    // Mover jugador
+    tablero.nodoJugador->estaJugador = false;
+    destino->estaJugador = true;
+    tablero.nodoJugador = destino;
 
-    // 5. Sumar puntaje
-    jugador.sumarPunto();   // este método debe existir en Jugador
+    // Destapar casilla
+    destino->estaDescubierto = true;
 
-    // 6. Si hay tesoro
-    if (destino->tieneTesoro) {
-        std::cout << "¡Encontraste un tesoro: "
-                  << destino->tipoTesoro << "!\n";
-
-        pila.push(Tesoro(destino->tipoTesoro));
-        destino->tieneTesoro = false;
+    // Si hay tesoro
+    if (destino->estaTesoro) {
+        jugador.agregarTesoro(destino->tipoTesoro);
+        destino->estaTesoro = false;
+        destino->tipoTesoro = "";
     }
 
-    // 7. Destapar la casilla
-    destino->visitado = true;
+    jugador.aumentarPuntaje();
 
     return true;
 }
 
-bool Movimiento::moverAbajo(Tablero& tablero, Jugador& jugador, PilaTesoros& pila) {
-    Nodo* actual = tablero.getJugadorPos();
-    Nodo* destino = actual->abajo;
-
-    if (destino == nullptr) return false;
-    if (destino->esParedExterior) return false;
-    if (destino->esMuroInterior) return false;
-
-    actual->jugador = false;
-    destino->jugador = true;
-    tablero.setJugadorPos(destino);
-
-    jugador.sumarPunto();
-
-    if (destino->tieneTesoro) {
-        pila.push(Tesoro(destino->tipoTesoro));
-        destino->tieneTesoro = false;
-    }
-
-    destino->visitado = true;
-    return true;
+bool Movimiento::moverArriba(Tablero &tablero, Jugador &jugador) {
+    return mover(tablero, jugador, tablero.nodoJugador->arriba);
 }
 
-
-bool Movimiento::moverIzquierda(Tablero& tablero, Jugador& jugador, PilaTesoros& pila) {
-    Nodo* actual = tablero.getJugadorPos();
-    Nodo* destino = actual->izquierda;
-
-    if (destino == nullptr) return false;
-    if (destino->esParedExterior) return false;
-    if (destino->esMuroInterior) return false;
-
-    actual->jugador = false;
-    destino->jugador = true;
-    tablero.setJugadorPos(destino);
-
-    jugador.sumarPunto();
-
-    if (destino->tieneTesoro) {
-        pila.push(Tesoro(destino->tipoTesoro));
-        destino->tieneTesoro = false;
-    }
-
-    destino->visitado = true;
-    return true;
+bool Movimiento::moverAbajo(Tablero &tablero, Jugador &jugador) {
+    return mover(tablero, jugador, tablero.nodoJugador->abajo);
 }
 
-bool Movimiento::moverDerecha(Tablero& tablero, Jugador& jugador, PilaTesoros& pila) {
-    Nodo* actual = tablero.getJugadorPos();
-    Nodo* destino = actual->derecha;
+bool Movimiento::moverIzquierda(Tablero &tablero, Jugador &jugador) {
+    return mover(tablero, jugador, tablero.nodoJugador->izquierda);
+}
 
-    if (destino == nullptr) return false;
-    if (destino->esParedExterior) return false;
-    if (destino->esMuroInterior) return false;
-
-    actual->jugador = false;
-    destino->jugador = true;
-    tablero.setJugadorPos(destino);
-
-    jugador.sumarPunto();
-
-    if (destino->tieneTesoro) {
-        pila.push(Tesoro(destino->tipoTesoro));
-        destino->tieneTesoro = false;
-    }
-
-    destino->visitado = true;
-    return true;
+bool Movimiento::moverDerecha(Tablero &tablero, Jugador &jugador) {
+    return mover(tablero, jugador, tablero.nodoJugador->derecha);
 }

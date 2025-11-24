@@ -13,9 +13,9 @@ class Tesoro;
 class Juego {
 private:
     Jugador jugador;
-    Tablero *tablero;      // → Persona 1 lo crea y lo pasa a Juego
-    PilaTesoros *pila;     // → Persona 2 lo crea y lo pasa a Juego
-    Puntaje puntajes;      // → Tabla Hash que ya aprobamos
+    Tablero *tablero;
+    PilaTesoros *pila;
+    Puntaje puntajes;
 
     int tesorosRecolectados;
 

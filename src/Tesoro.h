@@ -3,18 +3,11 @@
 
 #include <string>
 
-class Tesoro {
-private:
+struct Tesoro {
     std::string tipo;
 
-public:
-    Tesoro();
-    Tesoro(const std::string& tipo);
-
-    std::string getTipo() const;
-};
+    Tesoro(std::string t = "") : tipo(t) {}
 };
 
+#endif
 
-
-#endif //TESORO_H
